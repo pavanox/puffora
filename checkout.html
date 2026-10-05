@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Checkout | Puffora Naturals</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="header"></div>
+
+    <section class="checkout-shell">
+        <div class="checkout-card">
+            <h2>Checkout</h2>
+            <p>Please complete your details to review your order.</p>
+            <div id="checkout-content"></div>
+        </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/include.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/config.js"></script>
+    <script>
+        (function () {
+            const cartStorageKey = 'puffora-cart';
+            const buyNowStorageKey = 'puffora-buy-now';
+
+            // Backend base URL comes from js/config.js so the same build works
+            // locally and in production; no hardcoded host.
+            const apiUrl = function (path) {
+                return window.PufforaConfig ? window.PufforaConfig.url(path) : path;
+            };
+            const container = document.getElementById('checkout-content');
+
+            function getCart() {
+                try {
+                    const storedValue = sessionStorage.getItem(cartStorageKey);
+                    return storedValue ? JSON.parse(storedValue) : { items: [] };
+                } catch (error) {
+                    return { items: [] };
+                }
+            }
+
+            function getBuyNowItem() {
+                try {
+                    const storedValue = sessionStorage.getItem(buyNowStorageKey);
+                    return storedValue ? JSON.parse(storedValue) : null;
+                } catch (error) {
+                    return null;
+                }
+            }
+
+            function getCheckoutItems() {
+                const buyNowItem = getBuyNowItem();
+                const cart = getCart();
+                const cartItems = cart.items || [];
+                if (buyNowItem && buyNowItem.productId) {
+                    return [buyNowItem];
+                }
+                return cartItems;
+            }
+
+            function calculateTotals(items) {
+                const subtotal = items.reduce(function (total, item) {
+                    return total + ((Number(item.productPrice) || 0) * (Number(item.quantity) || 1));
+                }, 0);
+                const shipping = subtotal > 0 ? 99 : 0;
+                const grandTotal = subtotal + shipping;
+                return { subtotal, shipping, grandTotal };
+            }
+
+            function renderForm(items) {
+                if (!items.length) {
+                    container.innerHTML = '<div class="checkout-empty"><h4>Your cart is empty</h4><p>Add products before continuing to checkout.</p><a href="index.html" class="cart-action-btn buy">Continue Shopping</a></div>';
+                    return;
+                }
+
+                const totals = calculateTotals(items);
+                container.innerHTML = '';
+                const form = document.createElement('form');
+                form.id = 'checkout-form';
+                form.innerHTML = [
+                    '<div class="checkout-grid">',
+                    '  <div class="checkout-form-block">',
+                    '    <h4>Customer Details</h4>',
+                    '    <div class="checkout-field">',
+                    '      <label>Full Name <span class="required">*</span></label>',
+                    '      <input type="text" name="fullName" required>',
+                    '    </div>',
+                    '    <div class="checkout-field">',
+                    '      <label>Email <span class="required">*</span></label>',
+                    '      <input type="email" name="email" required>',
+                    '    </div>',
+                    '    <div class="checkout-field">',
+                    '      <label>Phone Number <span class="required">*</span></label>',
+                    '      <input type="tel" name="phone" required>',
+                    '    </div>',
+                    '    <div class="checkout-field">',
+                    '      <label>Address <span class="required">*</span></label>',
+                    '      <textarea name="address" required></textarea>',
+                    '    </div>',
+                    '    <div class="checkout-field">',
+                    '      <label>City <span class="required">*</span></label>',
+                    '      <input type="text" name="city" required>',
+                    '    </div>',
+                    '    <div class="checkout-field">',
+                    '      <label>State <span class="required">*</span></label>',
+                    '      <input type="text" name="state" required>',
+                    '    </div>',
+                    '    <div class="checkout-field">',
+                    '      <label>Pincode <span class="required">*</span></label>',
+                    '      <input type="text" name="pincode" required>',
+                    '    </div>',
+                    '  </div>',
+                    '  <div class="checkout-review-block">',
+                    '    <h4>Order Review</h4>',
+                    items.map(function (item) {
+                        const itemTotal = (Number(item.productPrice) || 0) * (Number(item.quantity) || 1);
+                        const imageMarkup = item.productImage ? '<img src="' + item.productImage + '" alt="' + (item.productName || 'Product') + '">' : '<div class="checkout-product-image"><i class="fas fa-box"></i></div>';
+                        const variantSizeText = item.variantSize ? ' (' + item.variantSize + 'g)' : '';
+                        return '<div class="checkout-product">' + imageMarkup + '<div class="checkout-product-details"><strong>' + (item.productName || 'Product') + variantSizeText + '</strong><div>₹' + (Number(item.productPrice) || 0).toLocaleString('en-IN') + ' × ' + (item.quantity || 1) + ' = ₹' + itemTotal.toLocaleString('en-IN') + '</div></div></div>';
+                    }).join(''),
+                    '    <div class="checkout-summary">',
+                    '      <div class="summary-row"><span>Subtotal</span><strong>₹' + totals.subtotal.toLocaleString('en-IN') + '</strong></div>',
+                    '      <div class="summary-row"><span>Shipping</span><strong>₹' + totals.shipping.toLocaleString('en-IN') + '</strong></div>',
+                    '      <div class="summary-row total"><span>Grand Total</span><strong>₹' + totals.grandTotal.toLocaleString('en-IN') + '</strong></div>',
+                    '    </div>',
+                    '    <button type="submit" class="buy-now" style="margin-top:16px;">Confirm & Pay ₹' + totals.grandTotal.toLocaleString('en-IN') + '</button>',
+                    '  </div>',
+                    '</div>'
+                ].join('');
+
+                form.addEventListener('submit', async function (event) {
+                    event.preventDefault();
+                    const data = new FormData(form);
+                    const values = Object.fromEntries(data.entries());
+                    const errors = [];
+
+                    if (!values.fullName || !values.fullName.trim()) {
+                        errors.push('Full Name is required.');
+                    }
+                    if (!values.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
+                        errors.push('Please enter a valid email address.');
+                    }
+                    if (!values.phone || !/^(?:(?:\+|0{0,2})91[-\s]?)?[6-9]\d{9}$/.test(values.phone)) {
+                        errors.push('Please enter a valid Indian mobile number.');
+                    }
+                    if (!values.address || !values.address.trim()) {
+                        errors.push('Address is required.');
+                    }
+                    if (!values.city || !values.city.trim()) {
+                        errors.push('City is required.');
+                    }
+                    if (!values.state || !values.state.trim()) {
+                        errors.push('State is required.');
+                    }
+                    if (!values.pincode || !/^\d{6}$/.test(values.pincode)) {
+                        errors.push('Please enter a valid 6-digit Indian PIN code.');
+                    }
+
+                    const feedback = document.createElement('div');
+                    feedback.className = 'checkout-feedback';
+                    if (errors.length) {
+                        feedback.innerHTML = '<ul>' + errors.map(function (error) { return '<li>' + error + '</li>'; }).join('') + '</ul>';
+                        feedback.classList.add('error');
+                    } else {
+                        try {
+                            const response = await fetch(apiUrl('/api/orders'), {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    clientOrderId: 'checkout-' + Date.now(),
+                                    customer: {
+                                        fullName: values.fullName.trim(),
+                                        email: values.email.trim(),
+                                        phone: values.phone.trim(),
+                                        address: values.address.trim(),
+                                        city: values.city.trim(),
+                                        state: values.state.trim(),
+                                        pincode: values.pincode.trim()
+                                    },
+                                    items: items.map(function (item) {
+                                        return {
+                                            productId: item.productId,
+                                            variantId: item.variantId || '',
+                                            quantity: Number(item.quantity) || 1
+                                        };
+                                    }),
+                                    sessionId: sessionStorage.getItem('puffora-session-id') || 'anonymous'
+                                })
+                            });
+
+                            const result = await response.json();
+                            if (!response.ok) {
+                                throw new Error((result.errors || ['Unable to create order.']).join(', '));
+                            }
+
+                            const payment = result.payment || {};
+                            // Stash the order token so the thank-you page can prove it
+                            // is allowed to read this order back.
+                            try {
+                                sessionStorage.setItem('puffora-order-token', result.orderToken || '');
+                            } catch (storageError) {
+                                // Ignore: the redirect below also carries the token.
+                            }
+                            feedback.innerHTML = '<p>Order created successfully. Order ID: <strong>' + result.order.orderId + '</strong></p><p>Payment status: <strong>' + result.order.paymentStatus + '</strong></p>';
+                            feedback.classList.add('success');
+
+                            const paymentButton = document.createElement('button');
+                            paymentButton.type = 'button';
+                            paymentButton.className = 'buy-now';
+                            paymentButton.style.marginTop = '12px';
+                            paymentButton.textContent = payment.mode === 'live' ? 'Pay Now' : 'Continue with Demo Payment';
+                            paymentButton.addEventListener('click', async function () {
+                                try {
+                                    if (payment.mode === 'live') {
+                                        if (!window.Razorpay) {
+                                            const script = document.createElement('script');
+                                            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+                                            script.async = true;
+                                            document.body.appendChild(script);
+                                            await new Promise(function (resolve, reject) {
+                                                script.onload = resolve;
+                                                script.onerror = reject;
+                                            });
+                                        }
+
+                                        const options = {
+                                            key: payment.keyId,
+                                            amount: payment.amount,
+                                            currency: payment.currency,
+                                            name: 'Puffora Naturals',
+                                            description: 'Order ' + result.order.orderId,
+                                            order_id: payment.razorpayOrderId,
+                                            handler: async function (response) {
+                                                try {
+                                                    const verifyResponse = await fetch(apiUrl('/api/payments/verify'), {
+                                                        method: 'POST',
+                                                        headers: {
+                                                            'Content-Type': 'application/json'
+                                                        },
+                                                        body: JSON.stringify({
+                                                            orderId: result.order.orderId,
+                                                            paymentId: response.razorpay_payment_id,
+                                                            signature: response.razorpay_signature,
+                                                            razorpayOrderId: response.razorpay_order_id
+                                                        })
+                                                    });
+
+                                                    const verifyResult = await verifyResponse.json();
+                                                    if (!verifyResponse.ok) {
+                                                        throw new Error(verifyResult.error || 'Payment verification failed.');
+                                                    }
+
+                                                    sessionStorage.removeItem('puffora-cart');
+                                                    sessionStorage.removeItem('puffora-buy-now');
+                                                    window.location.href = 'thank-you.html?orderId=' + encodeURIComponent(result.order.orderId) + '&token=' + encodeURIComponent(result.orderToken || '');
+                                                } catch (error) {
+                                                    await fetch(apiUrl('/api/payments/fail'), {
+                                                        method: 'POST',
+                                                        headers: {
+                                                            'Content-Type': 'application/json'
+                                                        },
+                                                        body: JSON.stringify({ orderId: result.order.orderId })
+                                                    });
+                                                    feedback.innerHTML = '<p>' + error.message + '</p>';
+                                                    feedback.classList.add('error');
+                                                }
+                                            },
+                                            prefill: {
+                                                name: values.fullName.trim(),
+                                                email: values.email.trim(),
+                                                contact: values.phone.trim()
+                                            },
+                                            theme: {
+                                                color: '#1e5a0f'
+                                            },
+                                            modal: {
+                                                ondismiss: async function () {
+                                                    try {
+                                                        await fetch(apiUrl('/api/payments/cancel'), {
+                                                            method: 'POST',
+                                                            headers: {
+                                                                'Content-Type': 'application/json'
+                                                            },
+                                                            body: JSON.stringify({ orderId: result.order.orderId })
+                                                        });
+                                                    } catch (cancelError) {
+                                                        // Ignore cancellation errors and let the user retry.
+                                                    }
+                                                    feedback.innerHTML = '<p>Payment was cancelled. Your cart is still intact. You can retry payment below.</p>';
+                                                    feedback.classList.add('error');
+                                                }
+                                            }
+                                        };
+
+                                        const razorpay = new window.Razorpay(options);
+                                        razorpay.open();
+                                        return;
+                                    }
+
+                                    const verifyResponse = await fetch(apiUrl('/api/payments/verify'), {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({
+                                            orderId: result.order.orderId,
+                                            paymentId: 'demo-payment-' + Date.now(),
+                                            signature: 'demo-signature',
+                                            razorpayOrderId: payment.razorpayOrderId || ''
+                                        })
+                                    });
+
+                                    const verifyResult = await verifyResponse.json();
+                                    if (!verifyResponse.ok) {
+                                        throw new Error(verifyResult.error || 'Payment verification failed.');
+                                    }
+
+                                    sessionStorage.removeItem('puffora-cart');
+                                    sessionStorage.removeItem('puffora-buy-now');
+                                    window.location.href = 'thank-you.html?orderId=' + encodeURIComponent(result.order.orderId) + '&token=' + encodeURIComponent(result.orderToken || '');
+                                } catch (error) {
+                                    await fetch(apiUrl('/api/payments/fail'), {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({ orderId: result.order.orderId })
+                                    });
+                                    feedback.innerHTML = '<p>' + error.message + '</p>';
+                                    feedback.classList.add('error');
+                                }
+                            });
+                            form.appendChild(paymentButton);
+                        } catch (error) {
+                            feedback.innerHTML = '<p>' + error.message + '</p>';
+                            feedback.classList.add('error');
+                        }
+                    }
+
+                    const existingFeedback = form.querySelector('.checkout-feedback');
+                    if (existingFeedback) {
+                        existingFeedback.remove();
+                    }
+                    form.appendChild(feedback);
+                });
+
+                container.appendChild(form);
+            }
+
+            renderForm(getCheckoutItems());
+        })();
+    </script>
+</body>
+</html>

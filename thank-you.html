@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Thank You | Puffora Naturals</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="header"></div>
+
+    <section class="checkout-shell">
+        <div class="checkout-card confirmation-card">
+            <div id="thank-you-content">
+                <h2>Thank you for placing your order!</h2>
+                <p>We are preparing your order and will share updates shortly.</p>
+            </div>
+            <a href="index.html" class="cart-action-btn buy">Continue Shopping</a>
+        </div>
+    </section>
+
+    <div id="footer"></div>
+
+    <script src="js/include.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/config.js"></script>
+    <script>
+        (function () {
+            const container = document.getElementById('thank-you-content');
+            const params = new URLSearchParams(window.location.search);
+            const orderId = params.get('orderId');
+            const orderToken = params.get('token');
+
+            // Backend base URL comes from js/config.js; no hardcoded host.
+            const apiUrl = function (path) {
+                return window.PufforaConfig ? window.PufforaConfig.url(path) : path;
+            };
+
+            async function loadOrder() {
+                if (!orderId) {
+                    container.innerHTML = '<h2>Thank you for placing your order!</h2><p>Your order details are being prepared.</p>';
+                    return;
+                }
+
+                try {
+                    // The order token authorises reading this order. It comes from
+                    // the checkout redirect, with sessionStorage as a fallback.
+                    let token = orderToken;
+                    if (!token) {
+                        try {
+                            token = sessionStorage.getItem('puffora-order-token');
+                        } catch (storageError) {
+                            token = null;
+                        }
+                    }
+
+                    const url = apiUrl('/api/orders/' + encodeURIComponent(orderId) +
+                        (token ? '?token=' + encodeURIComponent(token) : '');
+                    const response = await fetch(url);
+                    const result = await response.json();
+                    if (!response.ok) {
+                        throw new Error(result.error || 'Unable to load order details.');
+                    }
+
+                    const order = result.order || {};
+                    const subtotal = Number(order.subtotal || 0);
+                    const shipping = Number(order.shipping || 0);
+                    const total = Number(order.grandTotal || 0);
+                    const orderedAt = order.createdAt ? new Date(order.createdAt).toLocaleString('en-IN') : 'Pending';
+                    const itemsMarkup = (order.items || []).map(function (item) {
+                        const variantSizeText = item.variantSize ? ' (' + item.variantSize + 'g)' : '';
+                        return '<li class="confirmation-item"><span>' + (item.productName || item.productId) + variantSizeText + ' × ' + item.quantity + '</span><strong>₹' + Number(item.itemTotal || 0).toLocaleString('en-IN') + '</strong></li>';
+                    }).join('');
+
+                    container.innerHTML = [
+                        '<h2>Thank you for placing your order!</h2>',
+                        '<p>Your payment has been verified and your order is confirmed.</p>',
+                        '<div class="confirmation-grid">',
+                        '  <div><span class="confirmation-label">Order ID</span><strong>' + order.orderId + '</strong></div>',
+                        '  <div><span class="confirmation-label">Customer</span><strong>' + (order.customer && order.customer.firstName ? order.customer.firstName : 'Guest') + '</strong></div>',
+                        '  <div><span class="confirmation-label">Amount Paid</span><strong>₹' + total.toLocaleString('en-IN') + '</strong></div>',
+                        '  <div><span class="confirmation-label">Payment Status</span><strong>' + (order.paymentStatus || 'PENDING') + '</strong></div>',
+                        '  <div><span class="confirmation-label">Order Date</span><strong>' + orderedAt + '</strong></div>',
+                        '</div>',
+                        '<div class="confirmation-summary">',
+                        '  <h4>Order Summary</h4>',
+                        '  <ul>' + itemsMarkup + '</ul>',
+                        '  <div class="confirmation-total"><span>Subtotal</span><strong>₹' + subtotal.toLocaleString('en-IN') + '</strong></div>',
+                        '  <div class="confirmation-total"><span>Shipping</span><strong>₹' + shipping.toLocaleString('en-IN') + '</strong></div>',
+                        '  <div class="confirmation-total"><span>Grand Total</span><strong>₹' + total.toLocaleString('en-IN') + '</strong></div>',
+                        '</div>'
+                    ].join('');
+
+                    // The token is single-use from the customer's point of view;
+                    // drop it now that the receipt has been rendered.
+                    try {
+                        sessionStorage.removeItem('puffora-order-token');
+                    } catch (storageError) {
+                        // Ignore storage failures; the receipt is already rendered.
+                    }
+                } catch (error) {
+                    container.innerHTML = '<h2>Thank you for placing your order!</h2><p>' + error.message + '</p>';
+                }
+            }
+
+            loadOrder();
+        })();
+    </script>
+</body>
+</html>
