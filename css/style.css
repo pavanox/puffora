@@ -542,23 +542,41 @@
 }
 
 
-/* Announcement bar (news ticker) */
+/* Announcement bar (news ticker) - edge to edge */
 .announcement-bar {
     padding: 0.45rem 0;
     border-top: 1px solid rgba(0,0,0,0.04);
     z-index: 1035;
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* Break out of boxed .container so ticker uses full viewport width,
+   keep a small breathing space at start/end */
+.announcement-bar > .container,
+.announcement-bar .container {
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
 }
 
 .announcement-bar .ticker {
     overflow: hidden;
+    width: 100%;
+    display: block;
 }
 .announcement-bar .ticker__wrap {
-    display: inline-block;
+    display: flex;
+    width: max-content;
     white-space: nowrap;
     will-change: transform;
     animation: ticker-scroll 20s linear infinite;
 }
 .announcement-bar .ticker__item {
+    flex: 0 0 auto;
     display: inline-block;
     padding-right: 4rem;
     font-weight: 600;
@@ -1710,6 +1728,275 @@ background:#14532d;
 background:#ff9900;
 }
 
+
+/* ============================================================
+   Mobile responsiveness (320px - 430px)
+   Appended last so these rules override the desktop defaults.
+   Scope is intentionally narrow: only phones and small tablets.
+   ============================================================ */
+
+/* Prevent any page from scrolling sideways. Individual components below
+   are sized to fit, this is the final safety net. */
+@media (max-width: 575.98px) {
+
+    html,
+    body {
+        overflow-x: hidden;
+    }
+
+    /* --- Header / navigation --- */
+
+    /* The logo is 100px tall on desktop which pushes the fixed header down and
+       eats the viewport on a phone. */
+    .navbar .navbar-brand img {
+        max-height: 52px !important;
+    }
+
+    .navbar {
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+
+    /* Keep the cart bag reachable without opening the menu. */
+    .navbar .cart-indicator {
+        margin-right: 4px;
+    }
+
+    .navbar-toggler {
+        padding: 8px 10px;
+        border: 1px solid #e2e2e2;
+    }
+
+    /* The collapsed menu is full width; give it breathing room and left
+       alignment so items do not sit flush against the screen edge. */
+    .navbar .navbar-collapse {
+        padding: 8px 0 4px;
+    }
+
+    .navbar .navbar-nav {
+        padding: 0 !important;
+    }
+
+    .navbar .navbar-nav .nav-link {
+        padding: 12px 16px !important;
+        font-size: 16px;
+    }
+
+    .navbar .dropdown-menu {
+        width: 100%;
+        border-radius: 8px;
+        margin: 0 16px 8px;
+    }
+
+    /* --- Page spacing --- */
+
+    /* Desktop uses 120px top padding to clear the fixed header, which is far
+       too much once the header is this short on a phone. */
+    .cart-page,
+    .checkout-shell {
+        padding: 84px 12px 48px !important;
+    }
+
+    .checkout-card,
+    .cart-page .cart-card {
+        border-radius: 12px;
+    }
+
+    .checkout-card,
+    .checkout-card > * {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .checkout-card h2 {
+        font-size: 1.4rem;
+    }
+
+    /* --- Cart --- */
+
+    .cart-page .cart-header,
+    .cart-page .cart-content {
+        padding: 16px !important;
+    }
+
+    .cart-page .cart-header {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .cart-page .cart-header h2 {
+        font-size: 1.25rem;
+    }
+
+    .cart-summary {
+        padding: 16px;
+    }
+
+    /* Stop long product names and prices forcing the row wider than the screen. */
+    .cart-item-body {
+        min-width: 0;
+    }
+
+    .cart-item-title {
+        font-size: 15px;
+        overflow-wrap: break-word;
+    }
+
+    .cart-item-meta {
+        gap: 8px;
+    }
+
+    /* Quantity buttons grow to a comfortable tap size. */
+    .cart-qty-controls {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .cart-qty-controls button {
+        min-width: 44px;
+        min-height: 44px;
+        font-size: 16px;
+    }
+
+    /* --- Buttons and tap targets --- */
+
+    .cart-action-btn,
+    .checkout-actions a,
+    .checkout-actions button {
+        min-height: 46px;
+        padding: 12px 18px;
+        font-size: 15px;
+    }
+
+    /* Full width reads far better than two cramped side by side. */
+    .checkout-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .checkout-actions a,
+    .checkout-actions button {
+        width: 100%;
+    }
+
+    /* --- Forms --- */
+
+    /* 16px keeps iOS Safari from zooming the viewport when a field is focused. */
+    .checkout-field input,
+    .checkout-field textarea,
+    .checkout-field select,
+    .form-control {
+        font-size: 16px;
+        padding: 12px 14px;
+        width: 100%;
+    }
+
+    .checkout-field label {
+        font-size: 14px;
+        margin-bottom: 8px;
+    }
+
+    .checkout-field {
+        margin-bottom: 16px;
+    }
+
+    /* --- Pack size / price selector on product pages --- */
+
+    .pack-size-selector {
+        padding: 14px 12px;
+        margin: 16px 0;
+    }
+
+    /* Wraps instead of pushing the layout sideways on narrow screens. */
+    .pack-size-options {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .pack-size-option {
+        flex: 1 1 auto;
+        min-width: 76px;
+        min-height: 44px;
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+
+    .price-display {
+        font-size: 18px;
+    }
+
+    /* --- Order review --- */
+
+    .checkout-product {
+        gap: 12px;
+        padding: 14px 0;
+    }
+
+    .checkout-review-block,
+    .checkout-form-block {
+        padding: 16px;
+    }
+
+    .checkout-feedback {
+        font-size: 14px;
+    }
+
+    /* --- Confirmation --- */
+
+    .confirmation-grid > div {
+        font-size: 14px;
+    }
+
+    /* --- Footer --- */
+
+    .footer .container {
+        padding-top: 24px !important;
+        padding-bottom: 24px !important;
+    }
+
+    /* The five-column spacing is excessive on a phone. */
+    .footer .row {
+        --bs-gutter-y: 1.5rem;
+    }
+
+    .footer h6,
+    .footer h5 {
+        margin-bottom: 12px;
+    }
+}
+
+/* Very narrow phones (320px) need a little more room to breathe. */
+@media (max-width: 359.98px) {
+
+    .pack-size-option {
+        min-width: 66px;
+        font-size: 13px;
+        padding: 10px 8px;
+    }
+
+    .cart-page,
+    .checkout-shell {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+
+    .checkout-card h2 {
+        font-size: 1.25rem;
+    }
+}
+
+/* Respect users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
 .flipkart{
 background:#2874f0;
 }
@@ -2111,3 +2398,971 @@ grid-column:span 1;
 
 }
 
+
+/* ============================================================
+   Home page (index.html) mobile refinement - 320px to 430px
+   Scoped to .home-page so no other page is affected.
+   Desktop scale/spacing only; colours, fonts and content
+   are unchanged.
+   ============================================================ */
+
+@media (max-width: 767.98px) {
+
+    .home-page {
+        overflow-x: hidden;
+    }
+
+    /* --- Header: hamburger, logo, cart grouped left ---
+       Reordered with flex order rather than markup, so the
+       shared header markup stays untouched.
+       These are deliberately NOT scoped to .home-page: every
+       page shares this header, so they give all pages the
+       exact index-page mobile header. */
+    .navbar {
+                margin-left: 15px;
+        flex-wrap: wrap;
+        row-gap: 0;
+        padding-top: 6px;
+        padding-bottom: 6px;
+    }
+
+    .navbar-toggler {
+        order: 1;
+        margin-right: 10px !important;
+        padding: 6px 9px;
+        border: 1px solid #e6e6e6;
+    }
+
+    .navbar-brand {
+        order: 2;
+        margin-left: 0 !important;
+        margin-right: 6px;
+        line-height: 1;
+    }
+
+    .navbar-brand img {
+        max-height: 85px !important;
+        width: auto;
+    }
+
+    /* Cart sits immediately beside the logo. */
+    .navbar .cart-indicator {
+        order: 3;
+        margin-right: 15 !important;
+        font-size: 18px;
+    }
+
+    /* Collapsed menu drops onto its own full-width row. */
+    .navbar-collapse {
+        order: 4;
+        flex-basis: 100%;
+    }
+
+    .navbar .navbar-nav .nav-link {
+        padding: 11px 16px !important;
+        font-size: 15px;
+    }
+
+    /* --- Announcement bar --- */
+    .home-page .announcement-bar .ticker__item {
+        font-size: 12px;
+        padding: 6px 0;
+    }
+
+    /* --- Carousel --- */
+    .home-page #header-carousel {
+        margin-bottom: 1.5rem !important;
+    }
+
+    /* --- Section headings ---
+       .section-title is 44px on desktop; headings carrying an
+       inline font-size need !important to be overridden. */
+    .home-page .section-tag {
+        font-size: 12px;
+        padding: 5px 12px;
+        margin-bottom: 10px;
+        display: inline-block;
+    }
+
+    .home-page .section-title {
+        font-size: 26px;
+        line-height: 1.25;
+        margin-bottom: 8px;
+    }
+
+    .home-page .section-subtitle {
+        font-size: 14px;
+        line-height: 1.6;
+        margin-top: 6px;
+    }
+
+    /* --- Explore / Shop by Category header --- */
+    .home-page .category-section .text-center {
+        margin-bottom: 1.75rem !important;
+    }
+
+    /* --- Category cards: two per row, tight and even --- */
+    .home-page .category-section .row {
+        --bs-gutter-x: 0.75rem;
+        --bs-gutter-y: 0.75rem;
+    }
+
+    .home-page .category-section .col-lg-3,
+    .home-page .category-section .col-md-6 {
+        width: 50%;
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+
+    .home-page .category-card {
+        padding: 18px 12px;
+        height: 100%;
+    }
+
+    .home-page .category-icon {
+        width: 58px;
+        height: 58px;
+        margin-bottom: 14px;
+    }
+
+    .home-page .category-icon img {
+        width: 58px;
+        height: 58px;
+    }
+
+    .home-page .category-card h4 {
+        font-size: 15px;
+        line-height: 1.3;
+        margin-bottom: 4px;
+    }
+
+    .home-page .category-card p {
+        font-size: 12px;
+        margin-bottom: 12px;
+    }
+
+    /* Compact arrow link instead of a large pill button. */
+    .home-page .category-card span {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    /* --- About section --- */
+    .home-page .container-xxl {
+        padding-top: 1.5rem !important;
+        padding-bottom: 1.5rem !important;
+    }
+
+    .home-page .about-img {
+        padding: 0 !important;
+        margin-bottom: 1.25rem;
+    }
+
+    /* Centre the image and keep natural proportions. */
+    .home-page .about-img img {
+        display: block;
+        margin: 0 auto;
+        width: 100%;
+        max-width: 460px;
+        height: auto;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        object-position: center;
+        border-radius: 12px;
+    }
+
+    .home-page .row.g-5 {
+        --bs-gutter-y: 1.25rem;
+    }
+
+    .home-page .display-5 {
+        font-size: 24px !important;
+        line-height: 1.3;
+    }
+
+    /* Justified body text leaves rivers of white space in a narrow
+       column, so left align it on mobile. */
+    .home-page .col-lg-6 p {
+        text-align: left !important;
+        font-size: 15px;
+        line-height: 1.7;
+        margin-bottom: 0.9rem;
+    }
+
+    /* --- Read More --- */
+    .home-page .btn.rounded-pill.py-3 {
+        padding: 9px 20px !important;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    /* --- Our Products header --- */
+    .home-page .section-header {
+        max-width: 100% !important;
+        margin-bottom: 1rem !important;
+    }
+
+    .home-page .section-header .mb-3 {
+        margin-bottom: 0 !important;
+    }
+
+    .home-page .row.g-0.gx-5 {
+        --bs-gutter-x: 0;
+        --bs-gutter-y: 0.75rem;
+    }
+
+    /* --- Product filter pills ---
+       Four pills on one line overflow a 320px screen, so let
+       them flow onto neat rows. */
+    .home-page .nav-pills {
+        display: flex !important;
+        flex-wrap: wrap;
+        justify-content: flex-start !important;
+        gap: 8px;
+        margin-bottom: 1.25rem !important;
+    }
+
+    .home-page .nav-pills .nav-item {
+        margin-right: 0 !important;
+        margin: 0;
+    }
+
+    .home-page .nav-pills .nav-item .btn {
+        padding: 8px 14px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    /* --- Product grid: two across instead of one very wide card --- */
+    .home-page .tab-content .row {
+        --bs-gutter-x: 0.75rem;
+        --bs-gutter-y: 0.75rem;
+    }
+
+    .home-page .product-item {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .home-page .product-item .text-center.p-4 {
+        padding: 12px 8px !important;
+    }
+
+    .home-page .product-item a.h5 {
+        font-size: 13.5px;
+        line-height: 1.35;
+        margin-bottom: 8px !important;
+        overflow-wrap: break-word;
+    }
+
+    /* Keep Buy Now from dominating the card. */
+    .home-page .product-item .btn-primary {
+        padding: 7px 14px !important;
+        font-size: 12.5px;
+        line-height: 1.4;
+    }
+
+    /* --- Our Stores (marketplaces) --- */
+    .home-page .marketplaces {
+        padding: 2rem 0 !important;
+    }
+
+    .home-page .marketplaces h2 {
+        font-size: 22px;
+        line-height: 1.3;
+        margin-bottom: 8px;
+    }
+
+    .home-page .marketplaces p {
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .home-page .marketplaces .tag {
+        padding: 12px 14px;
+        font-size: 13px;
+    }
+
+    /* Decorative background blocks are too wide for a phone. */
+    .home-page .marketplaces::before,
+    .home-page .marketplaces::after {
+        display: none;
+    }
+
+    /* --- Testimonials --- */
+    .home-page .testimonial-carousel {
+        padding-bottom: 1.5rem;
+    }
+
+    .home-page .testimonial-item {
+        padding: 1rem !important;
+        text-align: center;
+    }
+}
+
+/* Narrowest supported phones (320px / 360px). */
+@media (max-width: 359.98px) {
+
+    .navbar-brand img {
+        max-height: 38px !important;
+    }
+
+    .home-page .section-title {
+        font-size: 23px;
+    }
+
+    .home-page .display-5 {
+        font-size: 21px !important;
+    }
+
+    .home-page .category-card {
+        padding: 14px 8px;
+    }
+
+    .home-page .category-card h4 {
+        font-size: 13.5px;
+    }
+
+    .home-page .product-item .text-center.p-4 {
+        padding: 10px 6px !important;
+    }
+
+    .home-page .product-item a.h5 {
+        font-size: 12.5px;
+    }
+
+    .home-page .product-item .btn-primary {
+        padding: 6px 10px !important;
+        font-size: 12px;
+    }
+
+    .home-page .nav-pills .nav-item .btn {
+        padding: 7px 11px;
+        font-size: 12px;
+    }
+}
+
+
+/* ============================================================
+   Home page mobile typography scale + section rhythm
+   One consistent size for each role so headings, body copy,
+   labels and buttons no longer differ between sections.
+   Reference scale (taken from the existing index styling):
+     section heading  22px
+     card sub-heading 15px
+     body copy        14px
+     small label      12px
+     button           13px
+   ============================================================ */
+
+@media (max-width: 767.98px) {
+
+    /* --- Uniform section headings ---
+       .section-title, .display-5 and .marketplaces h2 previously
+       rendered at 26px / 24px / 22px. They now share one size.
+       display-5 needs !important because of the inline font-size. */
+    .home-page .section-title,
+    .home-page .marketplaces h2 {
+        font-size: 22px;
+        line-height: 1.3;
+    }
+
+    .home-page .display-5 {
+        font-size: 22px !important;
+        line-height: 1.3;
+    }
+
+    /* --- Sub-headings (cards, testimonials) ---
+       Testimonial h5 was still on Bootstrap's 20px default,
+       which made names bigger than the product titles. */
+    .home-page .category-card h4,
+    .home-page .testimonial-item h5 {
+        font-size: 15px;
+        line-height: 1.35;
+    }
+
+    /* --- Body copy --- */
+
+    .home-page .section-subtitle,
+    .home-page .marketplaces p,
+    .home-page .testimonial-item p {
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    /* --- Small labels --- */
+
+    .home-page .section-tag {
+        font-size: 12px;
+        padding: 5px 12px;
+        margin-bottom: 8px;
+    }
+
+    .home-page .marketplaces .tag {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .home-page .category-card p {
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    /* --- Buttons --- */
+
+    .home-page .product-item .btn-primary {
+        font-size: 13px;
+        padding: 7px 14px !important;
+    }
+
+    .home-page .nav-pills .nav-item .btn {
+        font-size: 13px;
+        padding: 8px 14px;
+    }
+
+    /* --- Product titles --- */
+
+    .home-page .product-item a.h5 {
+        font-size: 13px;
+        margin-bottom: 8px !important;
+    }
+
+    /* --- Section rhythm ---
+       "Shop by Category" and "Shop Your Favorite Dry Fruits"
+       sit one below the other. Giving both the same vertical
+       padding keeps the gap between them even instead of one
+       section crowding the next. */
+    .home-page .category-section {
+        padding-top: 1.5rem !important;
+        padding-bottom: 1.5rem !important;
+    }
+
+    .home-page .marketplaces {
+        padding: 1.5rem 0 !important;
+    }
+
+    /* Even gap under the "Shop by Category" intro block. */
+    .home-page .category-section .text-center {
+        margin-bottom: 1.5rem !important;
+    }
+
+    /* Even gap under the "Shop Your Favorite Dry Fruits" block.
+       That section centres via .marketplaces .container rather than a
+       .text-center wrapper, so the spacing is set on its children.
+       Desktop used 20px / 18px / 20px margins. */
+    .home-page .marketplaces .tag {
+        margin-bottom: 10px;
+    }
+
+    .home-page .marketplaces p {
+        margin-bottom: 16px;
+    }
+
+    /* Sub-heading margins kept identical between the two headings. */
+    .home-page .section-title,
+    .home-page .marketplaces h2 {
+        margin-bottom: 8px;
+    }
+
+    /* Testimonial copy carried a desktop mb-4 (1.5rem) gap. */
+    .home-page .testimonial-item p {
+        margin-bottom: 10px !important;
+    }
+}
+
+/* Narrowest supported phones (320px / 360px): the same scale,
+   stepped down together so proportions hold. */
+@media (max-width: 359.98px) {
+
+    .home-page .section-title,
+    .home-page .marketplaces h2 {
+        font-size: 20px;
+    }
+
+    .home-page .display-5 {
+        font-size: 20px !important;
+    }
+
+    .home-page .category-card h4,
+    .home-page .testimonial-item h5 {
+        font-size: 14px;
+    }
+
+    .home-page .section-subtitle,
+    .home-page .marketplaces p,
+    .home-page .testimonial-item p {
+        font-size: 13px;
+    }
+
+    .home-page .product-item a.h5 {
+        font-size: 12.5px;
+    }
+
+    .home-page .product-item .btn-primary,
+    .home-page .nav-pills .nav-item .btn {
+        font-size: 12px;
+    }
+}
+
+
+/* ============================================================
+   Footer mobile compaction - 320px to 430px
+   The footer is shared by every page, so these rules are
+   limited to small screens only. Desktop is untouched.
+   ============================================================ */
+
+@media (max-width: 767.98px) {
+
+    /* Outer and inner padding: py-5 / pt-5 are 3rem each, which is
+       most of a phone screen of scrolling for no reason. */
+    .footer.pt-5 {
+        padding-top: 1.25rem !important;
+        padding-bottom: 0 !important;
+    }
+
+    .footer > .container {
+        padding-top: 0 !important;
+        padding-bottom: 1.25rem !important;
+    }
+
+    /* The 3rem column gutter left huge gaps between stacked blocks. */
+    .footer .row.g-5 {
+        --bs-gutter-y: 1rem;
+        --bs-gutter-x: 1rem;
+    }
+
+    .footer .col-lg-3,
+    .footer .col-md-6 {
+        margin-bottom: 0;
+    }
+
+    /* --- Headings ---
+       These are h4, which renders at 24px on mobile. Still larger
+       than body copy, but compact. */
+    .footer h4 {
+        font-size: 16px;
+        line-height: 1.3;
+        margin-bottom: 8px !important;
+    }
+
+    /* --- Body copy --- */
+
+    .footer p {
+        font-size: 13.5px;
+        line-height: 1.5;
+        margin-bottom: 6px;
+    }
+
+    /* The description sits under the FSSAI logo. */
+    .footer p[style*="padding-top"] {
+        padding-top: 8px !important;
+        margin-bottom: 10px;
+    }
+
+    /* --- Contact rows (address / phone / email) ---
+       Tighter icon gap so each line stays on one row. */
+    .footer p .fa {
+        font-size: 12px;
+    }
+
+    .footer p i.me-3 {
+        margin-right: 8px !important;
+    }
+
+    .footer a.text-decoration-none {
+        font-size: 13.5px;
+        overflow-wrap: anywhere;
+    }
+
+    /* --- Quick links ---
+       Bootstrap's .btn adds generous vertical padding, which makes
+       a short list of links into a tall block. */
+    .footer .btn.btn-link {
+        font-size: 14px;
+        line-height: 1.5;
+        padding: 3px 0 !important;
+        margin-bottom: 2px !important;
+    }
+
+    /* --- Social icons --- */
+
+    .footer .social-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+    .footer .d-flex.pt-2 {
+        padding-top: 4px !important;
+    }
+
+    /* --- FSSAI logo --- */
+
+    .footer img[alt="Puffora Naturals"] {
+        max-height: 56px !important;
+        width: auto;
+    }
+
+    /* --- Map embed --- */
+
+    .footer .position-relative iframe {
+        width: 100% !important;
+        max-width: 100%;
+        height: 140px;
+    }
+
+    /* --- Copyright bar --- */
+
+    .footer .copyright {
+        padding: 14px 0;
+        font-size: 12.5px;
+        line-height: 1.5;
+    }
+
+    .footer .copyright .mb-3 {
+        margin-bottom: 2px !important;
+    }
+}
+
+/* Narrowest supported phones (320px). */
+@media (max-width: 359.98px) {
+
+    .footer h4 {
+        font-size: 15px;
+    }
+
+    .footer p,
+    .footer a.text-decoration-none {
+        font-size: 13px;
+    }
+
+    .footer .btn.btn-link {
+        font-size: 13.5px;
+    }
+
+    .footer .social-icon {
+        width: 33px;
+        height: 33px;
+        font-size: 15px;
+    }
+
+    .footer img[alt="Puffora Naturals"] {
+        max-height: 48px !important;
+    }
+}
+
+
+/* ============================================================
+   Other customer-facing pages - mobile (320px - 767px)
+   Applies to: about, contact, faq, support, terms, 404,
+   thank-you, cart, checkout, and the four listing pages.
+
+   Type scale mirrors the index page mobile scale:
+     section heading  22px
+     sub-heading      15-17px
+     body copy        14px
+     button           14-15px
+   ============================================================ */
+
+@media (max-width: 767.98px) {
+
+    /* --- Typography scale ---
+       The stylesheet carries a global "h2 { font-size:36px }" which made
+       every unclassed heading oversized on a phone. Bootstrap h4/h5 were
+       also left at 24px / 20px. Everything drops to one compact scale.
+       Index page headings use class selectors, so they are unaffected. */
+    h2 {
+        font-size: 22px;
+        line-height: 1.3;
+        margin-bottom: 16px;
+    }
+
+    h3 {
+        font-size: 17px;
+        line-height: 1.35;
+    }
+
+    h4 {
+        font-size: 16px;
+        line-height: 1.35;
+    }
+
+    h5 {
+        font-size: 15px;
+        line-height: 1.4;
+    }
+
+    h6 {
+        font-size: 14px;
+    }
+
+    p {
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    /* Bootstrap hero headings used on about / contact / 404. */
+    .display-1 {
+        font-size: 40px !important;
+    }
+
+    .display-3 {
+        font-size: 26px !important;
+    }
+
+    .display-5 {
+        font-size: 22px !important;
+    }
+
+    /* Page-specific headings that override the bare-element rules above
+       (higher specificity), so they need their own mobile values. */
+    .supportx-heading h2,
+    .faq-header h2,
+    .terms-header h2 {
+        font-size: 22px;
+        margin-bottom: 12px;
+    }
+
+    .supportx-card h3 {
+        font-size: 15px;
+        margin-bottom: 8px;
+    }
+
+    .faq-header p,
+    .terms-header p,
+    .supportx-heading p {
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    /* --- Breadcrumb hero (about / contact / 404) ---
+       14rem of top padding cleared a desktop header; far too much on a
+       phone where the header is much shorter. */
+    .page-header,
+    .page-header1 {
+        padding-top: 110px !important;
+        padding-bottom: 32px !important;
+        background-position: center;
+    }
+
+    .breadcrumb {
+        font-size: 13px;
+        flex-wrap: wrap;
+        padding: 0;
+    }
+
+    /* --- Section spacing --- */
+    .faq-section,
+    .terms-section,
+    .supportx-section {
+        padding: 40px 16px;
+    }
+
+    .faq-header,
+    .terms-header,
+    .supportx-heading {
+        margin-bottom: 24px;
+    }
+
+    /* Product listing sections used 60px of vertical margin. */
+    .dryfruits {
+        width: 100%;
+        margin: 32px auto;
+    }
+
+    /* --- FAQ / Terms accordions --- */
+    summary {
+        padding: 16px 18px;
+        font-size: 15px;
+        padding-right: 52px;
+    }
+
+    summary::after {
+        right: 16px;
+        width: 28px;
+        height: 28px;
+        font-size: 18px;
+    }
+
+    .content {
+        padding: 0 18px 18px;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    /* --- Support grid cards --- */
+    .supportx-grid {
+        grid-auto-rows: minmax(190px, auto);
+        gap: 16px;
+    }
+
+    .supportx-emoji {
+        font-size: 40px;
+        margin-bottom: 14px;
+    }
+
+    /* --- Listing pages: tabs, image slider, actions --- */
+    .tabs {
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .tab {
+        font-size: 15px;
+        padding-bottom: 6px;
+    }
+
+    .slider {
+        max-width: 100%;
+    }
+
+    .slides {
+        height: 340px;
+    }
+
+    /* Desktop parks the arrows 60px outside the slider, which put them
+       off-screen on a phone and made the slider unusable. Pull them
+       inside the image. */
+    .prev {
+        left: 6px;
+    }
+
+    .next {
+        right: 6px;
+    }
+
+    .prev,
+    .next {
+        width: 38px;
+        height: 38px;
+        font-size: 18px;
+    }
+
+    .buttons {
+        gap: 10px;
+        margin-top: 16px;
+    }
+
+    .buttons a {
+        padding: 11px 16px;
+        font-size: 14px;
+    }
+
+    /* --- Buttons ---
+       :not() keeps .btn-lg-square (the round back-to-top control) at
+       its 48px size instead of inheriting this padding. */
+    .btn-lg:not(.btn-lg-square) {
+        font-size: 15px;
+        padding: 10px 20px;
+    }
+
+    /* Bootstrap py-3 / px-5 are !important, so this needs !important to
+       win. Scoped to non-homepage bodies: index.html carries
+       <body class="home-page"> and its 16 product CTAs already have their
+       own compact scale from the index block, which this must not
+       override. Covers the contact/404 Submit pill and the about Read
+       More pill (btn-secondary as well as btn-primary). */
+    body:not(.home-page) .rounded-pill.py-3 {
+        padding: 12px 24px !important;
+        font-size: 15px !important;
+    }
+
+    /* --- Contact info cards (address / phone / email) ---
+       p-5 is a Bootstrap !important utility. */
+    .bg-primary.p-5 {
+        padding: 24px !important;
+    }
+
+    .bg-primary.p-5 p.mb-5 {
+        margin-bottom: 1.25rem !important;
+    }
+
+    .bg-primary.p-5 h5 {
+        font-size: 15px;
+        margin-bottom: 6px;
+    }
+
+    .bg-primary.p-5 .d-flex.pt-2 {
+        margin-top: 0.5rem !important;
+    }
+}
+
+
+/* Narrowest supported phones (320px): the same scale, stepped down. */
+@media (max-width: 359.98px) {
+
+    h2 {
+        font-size: 20px;
+    }
+
+    h3 {
+        font-size: 16px;
+    }
+
+    h4 {
+        font-size: 15px;
+    }
+
+    .display-1 {
+        font-size: 34px !important;
+    }
+
+    .display-3 {
+        font-size: 23px !important;
+    }
+
+    .display-5 {
+        font-size: 20px !important;
+    }
+
+    .supportx-heading h2,
+    .faq-header h2,
+    .terms-header h2 {
+        font-size: 20px;
+    }
+
+    .page-header,
+    .page-header1 {
+        padding-top: 96px !important;
+    }
+
+    summary {
+        padding: 14px 16px;
+        font-size: 14.5px;
+        padding-right: 46px;
+    }
+
+    summary::after {
+        right: 12px;
+        width: 26px;
+        height: 26px;
+    }
+
+    .content {
+        padding: 0 16px 16px;
+        font-size: 13.5px;
+    }
+
+    .slides {
+        height: 300px;
+    }
+
+    .buttons a {
+        padding: 11px 13px;
+        font-size: 13.5px;
+    }
+
+    .btn-lg:not(.btn-lg-square) {
+        font-size: 14px;
+        padding: 10px 16px;
+    }
+
+    .bg-primary.p-5 {
+        padding: 20px !important;
+    }
+}
+
+.about-img.position-relative.overflow-hidden.p-5.pe-0 {
+    padding-left: 0px !important;
+}

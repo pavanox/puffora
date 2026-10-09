@@ -2,8 +2,8 @@
 <div class="container-fluid fixed-top px-0 wow fadeIn" data-wow-delay="0.1s">
     <div class="top-bar row gx-0 align-items-center d-none d-lg-flex">
         <div class="col-lg-6 px-5 text-start">
-            <small style="color:#fff"><i class="fa fa-map-marker-alt me-2"></i>No 15, Near Ghausia Masjid, Sangam Vihar,
-                Delhi</small>
+            <!-- <small style="color:#fff"><i class="fa fa-map-marker-alt me-2"></i>No 15, Near Ghausia Masjid, Sangam Vihar,
+                Delhi</small> -->
             <small style="color:#fff" class="ms-4"><i class="fa fa-envelope me-2"></i>info@pufforanaturals.com</small>
         </div>
         <div class="col-lg-6 px-5 text-end">
@@ -22,25 +22,31 @@
             <img src="img/puffora-logo.png" alt="Puffora Naturals" class="img-fluid"
                 style="max-height:100px; width:auto;" />
         </a>
-        <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <button type="button" class="navbar-toggler me-3 me-sm-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
+        <!-- Cart stays outside the collapsed menu so it is reachable on mobile. -->
+        <a class="cart-indicator d-lg-none me-3" href="cart.html" data-cart-badge aria-label="View cart">
+            <i class="fa fa-shopping-bag"></i>
+            <span class="cart-count" data-cart-count>0</span>
+        </a>
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <div class="navbar-nav ms-auto p-4 p-lg-0">
                 <a href="index.html" class="nav-item nav-link">Home</a>
-                <a href="about.html" class="nav-item nav-link">About Us</a>
+                
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Products</a>
                     <div class="dropdown-menu m-0">
-                        <a href="dry-fruits.html" class="dropdown-item">Dry Fruits</a>
                         <a href="premium-dates.html" class="dropdown-item">Premium Dates</a>
-                        <a href="seeds.html" class="dropdown-item">Seeds</a>
-                        <a href="healthy-snacks.html" class="dropdown-item">Healthy Snacks</a>
+                        <a href="dry-fruits.html" class="dropdown-item">Premium Dry Fruits</a>   
+                        <a href="healthy-snacks.html" class="dropdown-item">Premium Makhana</a>
+                        <a href="seeds.html" class="dropdown-item">Healthy Snacks & Seeds</a>
                     </div>
                 </div>
+                <a href="about.html" class="nav-item nav-link">About Us</a>
                 <a href="contact.html" class="nav-item nav-link">Contact Us</a>
             </div>
-            <div class="d-flex ms-2">
+            <div class="d-none d-lg-flex ms-2">
                 <a class="cart-indicator" href="cart.html" data-cart-badge aria-label="View cart">
                     <i class="fa fa-shopping-bag"></i>
                     <span class="cart-count" data-cart-count>0</span>

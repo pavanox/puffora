@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <title>Checkout | Puffora Naturals</title>
@@ -7,6 +8,7 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
 </head>
+
 <body>
     <div id="header"></div>
 
@@ -197,7 +199,19 @@
                                 })
                             });
 
-                            const result = await response.json();
+                            const text = await response.text();
+
+                            console.log("HTTP status:", response.status);
+                            console.log("Response body:", text);
+
+                            let result;
+                            try {
+                                result = JSON.parse(text);
+                            } catch {
+                                throw new Error(
+                                    `Server returned invalid or empty JSON. HTTP ${response.status}. Response: ${text || "(empty)"}`
+                                );
+                            }
                             if (!response.ok) {
                                 throw new Error((result.errors || ['Unable to create order.']).join(', '));
                             }
@@ -360,4 +374,5 @@
         })();
     </script>
 </body>
+
 </html>
